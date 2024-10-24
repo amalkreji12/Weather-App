@@ -1,0 +1,126 @@
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+
+        .weather-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #343a40;
+            text-align: center;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 40px;
+            color: #6c757d;
+        }
+
+        .form-group input {
+            padding-left: 40px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #343a40;
+            color: #fff;
+        }
+    </style>
+
+
+<body>
+    <!-- Navbar -->
+    
+
+    <!-- Main Weather Form Container -->
+    <div class="weather-container">
+        <h1><i class="fas fa-cloud-sun"></i> Weather Monitoring System</h1>
+        <form id="weather-form" class="mb-4">
+            <div class="form-group position-relative">
+                <label for="city">Enter City</label>
+                <i class="fas fa-city"></i>
+                <input type="text" class="form-control" id="city" name="city" placeholder="e.g., New York" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Get Weather Summary</button>
+        </form>
+
+        <div id="result" class="result-container d-none">
+            <!-- Weather summary will be displayed here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer ">
+        <p>&copy; 2024 Weather Monitoring. All Rights Reserved.</p>
+    </div>
+
+
+    <script>
+        document.getElementById('weather-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const city = document.getElementById('city').value;
+            const resultDiv = document.getElementById('result');
+
+            // Check if city field is empty
+            if (!city) {
+                resultDiv.textContent = 'Please enter a city.';
+                resultDiv.classList.remove('d-none');
+                return;
+            }
+
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            resultDiv.classList.remove('d-none'); // Show result container
+
+            try {
+                // Make the API request using Axios
+                const response = await axios.get(`/api/weather/${city}`);
+                const data = response.data;
+
+                const resultHtml = `
+                    <h2><i class="fas fa-map-marker-alt"></i> Weather Summary for ${data.city}</h2>
+                    <p><strong>Temperature:</strong> ${data.temp.toFixed(2)} °C</p>
+                    <p><strong>Feels Like:</strong> ${data.feels_like.toFixed(2)} °C</p>
+                    <p><strong>Weather:</strong> ${data.weather}</p>
+                    <p><strong>Time:</strong> ${new Date(data.time).toLocaleString()}</p>
+                `;
+                resultDiv.innerHTML = resultHtml; // Display formatted weather data
+            } catch (error) {
+                resultDiv.textContent = 'Error fetching weather summary: ' + error.message;
+                console.error('Error fetching weather summary:', error);
+            }
+        });
+    </script>
+</body>
+
